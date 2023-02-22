@@ -1,4 +1,4 @@
-import { defineConfig, normalizePath } from 'vite';
+import { defineConfig, normalizePath, loadEnv } from 'vite';
 
 // 引入 path 包注意两点：
 // 1、为避免类型报错，需要pnpm i @types/node -D安装
@@ -22,42 +22,79 @@ import autoprefixer from 'autoprefixer';
 // ToDo：与上方插件作用类似，不过是用于style的，不过不知道为啥子用不了
 // import viteStyleLint from 'vite-plugin-stylelint';
 
+import svgLoader from 'vite-svg-loader';
+
+// import imagemin from 'unplugin-imagemin/vite';
+
+// 是否为生产环境
+const isProduction = process.env.NODE_ENV === 'production';
+// 项目 CDN 域名地址，这样生产环境下资源文件就是以域名开头
+const CDN_URL = 'www.xxxxx.com';
+
 // https://vitejs.dev/config/
-export default defineConfig({
-  // css 相关
-  css: {
-    postcss: {
-      // postcss 插件地址:www.postcss.parts/
-      plugins: [
-        autoprefixer({
-          // 指定浏览器
-          overrideBrowserslist: ['> 1%', 'last 2 versions']
-        })
-      ]
+export default defineConfig(({ command, mode }) => {
+  // const env = loadEnv(mode, process.cwd(), '');
+  return {
+    base: isProduction ? CDN_URL : '/',
+
+    publicDir: 'assets',
+
+    build: {
+      // 静态资源两种构建方式：单文件、base64编码内嵌(svg不受这个临界值影响，始终会被打包成单文件的形式)
+      // 如果静态资源体积 >= 4KB，则提取成单独的文件
+      // 如果静态资源体积 < 4KB，则作为 base64 格式的字符串内联
+      assetsInlineLimit: 4 * 1024
     },
-    modules: {
-      // 一般我们通过 generateScopedName 属性来对生成的类名进行自定义
-      // 其中 name 表示当前文件名，local 表示类名
-      // generateScopedName: "[name]__[local]__[hash:base64:5]"
-    },
-    preprocessorOptions: {
-      scss: {
-        // additionalData 的内容会在每个 scss 文件的开头自定注入，这样就不需要每个组件都去手动引入全局公共样式了
-        additionalData: `@import "${variablePath}";`
+    // optimizeDeps: {
+    //   esbuildOptions: {
+    //     target: 'es2020'
+    //   }
+    // },
+
+    // css 相关
+    css: {
+      postcss: {
+        // postcss 插件地址:www.postcss.parts/
+        plugins: [
+          autoprefixer({
+            // 指定浏览器
+            overrideBrowserslist: ['> 1%', 'last 2 versions']
+          })
+        ]
+      },
+      modules: {
+        // 一般我们通过 generateScopedName 属性来对生成的类名进行自定义
+        // 其中 name 表示当前文件名，local 表示类名
+        // generateScopedName: "[name]__[local]__[hash:base64:5]"
+      },
+      preprocessorOptions: {
+        scss: {
+          // additionalData 的内容会在每个 scss 文件的开头自定注入，这样就不需要每个组件都去手动引入全局公共样式了
+          additionalData: `@import "${variablePath}";`
+        }
       }
-    }
-  },
+    },
 
-  // 手动指定项目的根目录位置
-  root: path.join(__dirname, 'src'), // 注意：当我们将入口改至src目录下后，public下的资源文件需要配置publicDir才能正确使用 https://vitejs.dev/config/shared-options.html#publicdir
+    resolve: {
+      // 别名配置
+      alias: {
+        '@assets': path.join(__dirname, 'src/assets')
+      }
+    },
 
-  plugins: [
-    vue(),
-    vueJsx()
-    // viteStyleLint({
-    //   // 忽略文件
-    //   exclude: /node_modules/
-    // })
-    // viteEslint()
-  ]
+    // 手动指定项目的根目录位置
+    root: path.join(__dirname, 'src'), // 注意：当我们将入口改至src目录下后，public下的资源文件需要配置publicDir才能正确使用 https://vitejs.dev/config/shared-options.html#publicdir
+
+    plugins: [
+      vue(),
+      vueJsx(),
+      svgLoader()
+      // imagemin()
+      // viteStyleLint({
+      //   // 忽略文件
+      //   exclude: /node_modules/
+      // })
+      // viteEslint()
+    ]
+  };
 });
