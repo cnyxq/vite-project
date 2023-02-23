@@ -24,7 +24,8 @@ import autoprefixer from 'autoprefixer';
 
 import svgLoader from 'vite-svg-loader';
 
-// import imagemin from 'unplugin-imagemin/vite';
+// 打包的时候自动压缩图片资源，教程：https://juejin.cn/post/7173430592715882526
+import imagemin from 'unplugin-imagemin/vite';
 
 // 是否为生产环境
 const isProduction = process.env.NODE_ENV === 'production';
@@ -88,8 +89,8 @@ export default defineConfig(({ command, mode }) => {
     plugins: [
       vue(),
       vueJsx(),
-      svgLoader()
-      // imagemin()
+      svgLoader(),
+      imagemin()
       // viteStyleLint({
       //   // 忽略文件
       //   exclude: /node_modules/
