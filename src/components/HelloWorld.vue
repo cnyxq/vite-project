@@ -7,12 +7,21 @@ import wallhaven2 from '@assets/wallhaven-955o8w.jpg';
 import wallhaven3 from '@assets/wallhaven-e73p1r.png';
 import wallhaven4 from '@assets/wallhaven-mp3w88.jpg';
 import wallhaven5 from '@assets/wallhaven-p2gg8j.jpg';
-const icons = import.meta.glob('../assets/icons/icon-*.svg', { eager: true });
-console.log(icons);
-const iconUrls = Object.values(icons).map((mod) => mod.default);
-console.log(iconUrls);
+
+// ToDo：
+// import SvgIcon from '@cmp/SvgIcon/index.vue';
+// const icons = import.meta.glob('../assets/icons/icon-*.svg', { eager: true });
+// console.log(icons);
+// const iconUrls = Object.values(icons).map((mod) => mod.default);
+// const iconUrls = Object.values(icons).map((mod) => {
+//   const fileName = mod.default.split('/').pop();
+//   const [svgName] = fileName.split('.');
+//   return svgName;
+// });
+// console.log(iconUrls);
+
 // ToDo：这里不知道为什么无法通过import.meta.env取到自定义环境变量
-// const url = new URL('./vueLogo.png', import.meta.env.VITE_IMG_BASE_URL).href;
+const url = new URL('./vueLogo.png', import.meta.env.VITE_IMG_BASE_URL).href;
 console.log(import.meta.env);
 </script>
 
@@ -21,17 +30,18 @@ console.log(import.meta.env);
     header
 
     <span class="item">123 </span>
-    <!-- <img :src="url" alt="" /> -->
+    <img :src="url" alt="" />
     <img :src="vueLogo" alt="" />
     <LogoSrc />
   </p>
-  <img
+  <!-- <img
     v-for="(icon, index) in iconUrls"
     :key="index"
     :src="icon"
     alt=""
     style="width: 20px"
-  />
+  /> -->
+  <!-- <SvgIcon v-for="item in iconUrls" :key="item" :name="item"></SvgIcon> -->
   <img :src="wallhaven1" alt="" />
   <img :src="wallhaven2" alt="" />
   <img :src="wallhaven3" alt="" />

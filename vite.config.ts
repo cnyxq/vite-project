@@ -1,5 +1,5 @@
 import { defineConfig, normalizePath, loadEnv } from 'vite';
-
+import { loadEnv as myLoadEnv } from './src/loadEnv.js';
 // 引入 path 包注意两点：
 // 1、为避免类型报错，需要pnpm i @types/node -D安装
 // 2、tsconfig.node.json 中设置 `allowSyntheticDefaultImports: true`，以允许下面的 default 导入方式
@@ -27,6 +27,8 @@ import svgLoader from 'vite-svg-loader';
 // 打包的时候自动压缩图片资源，教程：https://juejin.cn/post/7173430592715882526
 import imagemin from 'unplugin-imagemin/vite';
 
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+
 // 是否为生产环境
 const isProduction = process.env.NODE_ENV === 'production';
 // 项目 CDN 域名地址，这样生产环境下资源文件就是以域名开头
@@ -35,6 +37,7 @@ const CDN_URL = 'www.xxxxx.com';
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   // const env = loadEnv(mode, process.cwd(), '');
+  myLoadEnv(mode);
   return {
     base: isProduction ? CDN_URL : '/',
 
@@ -79,7 +82,8 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       // 别名配置
       alias: {
-        '@assets': path.join(__dirname, 'src/assets')
+        '@assets': path.join(__dirname, 'src/assets'),
+        '@cmp': path.join(__dirname, 'src/components')
       }
     },
 
@@ -90,7 +94,10 @@ export default defineConfig(({ command, mode }) => {
       vue(),
       vueJsx(),
       svgLoader(),
-      imagemin()
+      imagemin(),
+      createSvgIconsPlugin({
+        iconDirs: [path.join(__dirname, 'src/assets/icons')]
+      })
       // viteStyleLint({
       //   // 忽略文件
       //   exclude: /node_modules/

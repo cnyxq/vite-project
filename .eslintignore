@@ -1,3 +1,4 @@
 # eslint 忽略的文件或者文件夹
 .eslintrc.cjs
 src/dist/*
+src/loadEnv.js
